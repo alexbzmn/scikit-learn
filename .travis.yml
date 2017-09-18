@@ -1,7 +1,10 @@
 # make it explicit that we favor the new container-based travis workers
-sudo: false
+sudo: required
 
 language: python
+
+services:
+  - docker
 
 cache:
   apt: true
@@ -60,6 +63,14 @@ matrix:
     # We are using this to allow failures for DISTRIB=scipy-dev-wheels
     - python: 3.5
 
+before_install:
+  - docker run \
+    -e PYTHON_VERSION=${PYTHON_VERSION} \
+    -e NUMPY_VERSION=${NUMPY_VERSION} \
+    -e SCIPY_VERSION=${SCIPY_VERSION} \
+    -e CYTHON_VERSION=${CYTHON_VERSION} \
+    --rm -v`pwd`:/io quay.io/pypa/manylinux1_i686 \
+    bash /io/build_tools/travis/docker_test.sh
 install: source build_tools/travis/install.sh
 script: bash build_tools/travis/test_script.sh
 after_success: source build_tools/travis/after_success.sh
