@@ -17,18 +17,18 @@ export PATH=$MINICONDA_PATH/bin:$PATH
 
 conda update --yes conda
 
-conda create -n testenv --yes python=$PYTHON_VERSION pip \
-            numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION \
-            nomkl cython=$CYTHON_VERSION \
-            ${PANDAS_VERSION+pandas=$PANDAS_VERSION}
-
-source activate testenv
-
-export PATH=$MINICONDA_PATH/envs/testenv/bin:$PATH_OLD
+if [[ "$DISTRIB" != "ubuntu" ]]; then
+    conda create -n testenv --yes python=$PYTHON_VERSION pip \
+                numpy=$NUMPY_VERSION scipy=$SCIPY_VERSION \
+                nomkl cython=$CYTHON_VERSION \
+                ${PANDAS_VERSION+pandas=$PANDAS_VERSION}
+    export PATH=$MINICONDA_PATH/envs/testenv/bin:$PATH_OLD
+fi
 
 set -e
 pip install numpy scipy cython nose pytest
 cd /io
+chmod -R a+rwX .
 rm setup.cfg
 pip install -e .
 pytest -l sklearn
